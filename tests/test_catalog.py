@@ -5,11 +5,17 @@ import pytest
 from ai_agent_standards_mcp.catalog import build_catalog, find_standards_root
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_find_standards_root_detects_parent_checkout():
     assert find_standards_root(ROOT) == ROOT
+
+
+def test_build_catalog_uses_standalone_repo_by_default():
+    catalog = build_catalog()
+
+    assert catalog.root == ROOT
 
 
 def test_catalog_indexes_core_surfaces():
@@ -19,7 +25,8 @@ def test_catalog_indexes_core_surfaces():
     assert "karpathy-principles" in identifiers
     assert "skill-reference" in identifiers
     assert "codebase-onboarding" in identifiers
-    assert "codex" in identifiers
+    assert "codex" not in identifiers
+    assert all(entry["kind"] != "agent" for entry in catalog.list_entries())
 
 
 def test_catalog_reads_skill_by_name():

@@ -1,0 +1,15 @@
+---
+id: HEADER-TEMPLATE
+version: 1.0
+author: [Your Name]
+last_updated: 2026-05-12
+applicable_stack: [Tech Stack Here]
+category: [Category]
+difficulty: [Simple/Intermediate/Complex]
+---
+
+# [Tiêu đề Prompt]
+
+**Mục đích:** [Mô tả 1-2 dòng về prompt này làm gì]
+
+**Reference:** Phần III.2 - Khuôn mẫu Prompt Tiêu chuẩn

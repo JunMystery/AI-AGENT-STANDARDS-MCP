@@ -30,3 +30,10 @@ pythonpath = ["src"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ai_agent_standards_mcp"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"SKILL-REFERENCE.md" = "ai_agent_standards_mcp/bundled/SKILL-REFERENCE.md"
+"docs" = "ai_agent_standards_mcp/bundled/docs"
+"karpathy" = "ai_agent_standards_mcp/bundled/karpathy"
+"skills" = "ai_agent_standards_mcp/bundled/skills"
+"ai-agent-standards" = "ai_agent_standards_mcp/bundled/ai-agent-standards"

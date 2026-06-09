@@ -16,7 +16,11 @@ else:
     MCP_IMPORT_ERROR = None
 
 
-def create_server(root: str | Path | None = None) -> Any:
+def create_server(
+    root: str | Path | None = None,
+    host: str = "127.0.0.1",
+    port: int = 41731,
+) -> Any:
     if FastMCP is None:
         raise RuntimeError(
             "The 'mcp' package is required to run the server. Install with "
@@ -24,7 +28,7 @@ def create_server(root: str | Path | None = None) -> Any:
         ) from MCP_IMPORT_ERROR
 
     catalog = build_catalog(root)
-    mcp = FastMCP("AI Agent Standards", json_response=True)
+    mcp = FastMCP("AI Agent Standards", json_response=True, host=host, port=port)
     register_handlers(mcp, catalog)
     return mcp
 
@@ -44,11 +48,6 @@ def register_handlers(mcp: Any, catalog: StandardsCatalog) -> None:
     def skill(name: str) -> str:
         """Return a local on-demand skill capsule by name."""
         return catalog.read_entry(name)
-
-    @mcp.resource("standards://agent/{key}", mime_type="text/markdown")
-    def agent_instruction(key: str) -> str:
-        """Return a generated agent instruction file by agent key."""
-        return catalog.read_entry(key)
 
     @mcp.tool()
     def list_entries(category: str | None = None, kind: str | None = None) -> list[dict[str, str]]:
