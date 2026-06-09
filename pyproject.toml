@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-agent-standards-mcp"
+version = "0.1.0"
+description = "MCP server exposing AI Agent Coding Standards resources, skills, and prompts."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "AI Agent Standards Maintainers" }
+]
+dependencies = [
+  "mcp>=1.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0"
+]
+
+[project.scripts]
+ai-agent-standards-mcp = "ai_agent_standards_mcp.__main__:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_agent_standards_mcp"]
