@@ -18,12 +18,15 @@ if "%PYTHONPATH%"=="" (
 )
 
 :: Detect if the script was double-clicked from Windows Explorer
-:: If cmdcmdline contains '/c' and references the script name, it's typically an Explorer launch
+:: We check if stdin is a console (not redirected) using timeout, and if cmdcmdline indicates a /c launch
 set "IS_EXPLORER=0"
-echo %cmdcmdline% | findstr /i /c:"/c" >nul
+timeout /t 0 >nul 2>nul
 if %errorlevel% equ 0 (
-    echo %cmdcmdline% | findstr /i /c:"run-mcp.cmd" >nul
-    if %errorlevel% equ 0 set "IS_EXPLORER=1"
+    echo %cmdcmdline% | findstr /i /c:"/c" >nul
+    if %errorlevel% equ 0 (
+        echo %cmdcmdline% | findstr /i /c:"run-mcp.cmd" >nul
+        if %errorlevel% equ 0 set "IS_EXPLORER=1"
+    )
 )
 
 if "%IS_EXPLORER%"=="1" (
