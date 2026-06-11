@@ -101,8 +101,63 @@ def main():
         except Exception as e:
             print(f"    Error: Failed to write config file: {e}")
             
+    # 4. Configure Codex (config.toml)
+    configure_codex(python_exe, repo_root)
+            
     print("\n=== Installation Completed Successfully! ===")
     print("Restart your IDE / MCP Client to start using the server.")
+
+def configure_codex(python_exe, repo_root):
+    codex_dir = Path.home() / ".codex"
+    config_path = codex_dir / "config.toml"
+    
+    python_exe_str = str(python_exe).replace("\\", "\\\\")
+    pythonpath_str = str(repo_root / "src").replace("\\", "\\\\")
+    
+    new_block = [
+        "[mcp_servers.ai-agent-standards-mcp]",
+        f'command = "{python_exe_str}"',
+        'args = ["-m", "ai_agent_standards_mcp"]',
+        f'env = {{ PYTHONPATH = "{pythonpath_str}" }}',
+        ""
+    ]
+    
+    print("  Configuring Codex...")
+    try:
+        codex_dir.mkdir(parents=True, exist_ok=True)
+        content = ""
+        if config_path.exists():
+            content = config_path.read_text(encoding="utf-8")
+            
+        # Parse and replace the block if it exists
+        lines = content.splitlines()
+        new_lines = []
+        in_block = False
+        block_found = False
+        
+        for line in lines:
+            stripped = line.strip()
+            if stripped == "[mcp_servers.ai-agent-standards-mcp]":
+                in_block = True
+                block_found = True
+                new_lines.extend(new_block[:-1]) # add new block without the trailing newline
+                continue
+            if in_block:
+                if stripped.startswith("["):
+                    in_block = False # exited the block
+                    new_lines.append(line)
+                continue
+            new_lines.append(line)
+            
+        if not block_found:
+            if new_lines and new_lines[-1] != "":
+                new_lines.append("")
+            new_lines.extend(new_block)
+            
+        config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+        print("    Success: Configured 'ai-agent-standards-mcp' server in Codex config.toml.")
+    except Exception as e:
+        print(f"    Error: Failed to configure Codex: {e}")
 
 if __name__ == "__main__":
     main()

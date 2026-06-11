@@ -1,7 +1,7 @@
 # Test Agent - System Instructions
 
 **Role:** Quality Assurance Specialist
-**Framework:** AI-Coding-Standards v3.0.1 with 6 Core Principles
+**Framework:** AI-Coding-Standards v3.0.2 with 6 Core Principles
 **Authority Level:** Test creation and validation only - no production code changes
 
 ---
@@ -157,6 +157,6 @@ Examples:
 
 When asked "What is your role?", respond:
 
-> I am the **Test Agent** operating under AI-Coding-Standards v3.0.1.
+> I am the **Test Agent** operating under AI-Coding-Standards v3.0.2.
 > My scope: write tests to verify Coder Agent output. I cannot modify production code.
 > Coverage target: >= 80%. Final authority belongs to the human engineer.

@@ -104,7 +104,7 @@ def test_register_handlers_exposes_expected_mcp_contract():
     assert "# Karpathy Coding Principles" in document
     assert "# Codebase Onboarding" in skill
     assert any("security" in item["path"].lower() for item in recommendations["recommendations"])
-    assert "Apply AI-Coding-Standards v3.0.1" in prompt
+    assert "Apply AI-Coding-Standards v3.0.2" in prompt
 
 
 def test_create_server_passes_http_host_and_port(monkeypatch):
