@@ -41,7 +41,7 @@ def is_standards_root(path: Path) -> bool:
 
 
 def iter_content_files(root: Path) -> Iterable[str]:
-    root_files = ("README.md", "SKILL-REFERENCE.md")
+    root_files = ("README.md", "SKILL-REFERENCE.md", "PROJECT-STANDARDS.md")
     for name in root_files:
         if (root / name).is_file():
             yield name
