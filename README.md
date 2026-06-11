@@ -1,194 +1,158 @@
-# AI Agent Standards MCP (v3.0.3)
+# AI Agent Standards MCP (v3.0.0)
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Version](https://img.shields.io/badge/mcp-%3E%3D1.0.0-green)](https://modelcontextprotocol.io/)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#development)
 
-Model Context Protocol server for the AI Agent Coding Standards corpus (supporting skill set `v3.0.3`).
+MCP server phục vụ bộ chuẩn AI Agent Coding Standards và skill set v3.0.0 qua giao thức **Stdio** (không cần HTTP).
 
-This server exposes the standards corpus, local skills (v3.0.3), and recommendation
-workflows as MCP resources, tools, and prompts.
-The standards and skills are bundled in this repository so it can run as an
-independent checkout. This repo intentionally excludes direct AI-agent
-auto-discovery instruction files such as `AGENTS.md`, `CLAUDE.md`, and
-`.cursorrules`; clients should consume the content through MCP.
+![AI Agent Standards MCP Architecture Flowchart](docs/images/architecture-flowchart.png)
+
+---
 
 ## Install
 
-### Automatic Installation (Recommended)
-This script automatically sets up the python virtual environment, installs dependencies, and registers the server with your Claude Desktop configuration:
+**Automatic (recommended):**
+```bash
+python3 scripts/install-mcp.py        # Linux / macOS
+python  scripts/install-mcp.py        # Windows
+```
 
-- **Linux / macOS**:
-  ```bash
-  python3 scripts/install-mcp.py
-  ```
-- **Windows**:
-  ```powershell
-  python scripts/install-mcp.py
-  ```
-
-### Manual Installation
-If you prefer to set up manually:
+**Manual:**
 ```bash
 python -m venv .venv
-# On Windows:
-.venv\Scripts\pip install -e ".[dev]"
-# On Linux / macOS:
-.venv/bin/pip install -e ".[dev]"
+.venv/bin/pip install -e ".[dev]"     # Linux / macOS
+.venv\Scripts\pip install -e ".[dev]" # Windows
 ```
 
-### Quick Example (Testing with MCP Inspector)
-You can quickly verify and interact with the server locally using the Model Context Protocol Inspector:
+---
 
-1. Run the inspector pointing to the Python module in your virtual environment:
-   ```bash
-   npx @modelcontextprotocol/inspector .venv/bin/python -m ai_agent_standards_mcp
-   ```
-2. Open the printed URL (usually `http://localhost:5173`) in your browser to interactively call tools (like `list_entries` or `recommend_context`) and inspect prompts (like `plan` or `code`).
+## MCP Client Config
 
-## Run
+Add to your MCP client config (Claude Desktop, VS Code, Cursor…):
 
-From this directory:
-
-```bash
-python -m ai_agent_standards_mcp
+**Linux / macOS**
+```json
+{
+  "mcpServers": {
+    "ai-agent-standards-mcp": {
+      "command": "/absolute/path/to/repo/.venv/bin/python",
+      "args": ["-m", "ai_agent_standards_mcp"],
+      "env": { "PYTHONPATH": "/absolute/path/to/repo/src" }
+    }
+  }
+}
 ```
 
-Or run directly from the source checkout with the cross-platform python script:
-
-```bash
-python scripts/run-mcp.py
+**Windows**
+```json
+{
+  "mcpServers": {
+    "ai-agent-standards-mcp": {
+      "command": "C:\\absolute\\path\\to\\repo\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "ai_agent_standards_mcp"],
+      "env": { "PYTHONPATH": "C:\\absolute\\path\\to\\repo\\src" }
+    }
+  }
+}
 ```
-
-Other platform-specific launcher scripts are also available in `scripts/`:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\run-mcp.ps1
-```
-
-```cmd
-scripts\run-mcp.cmd
-```
-
-```bash
-./scripts/run-mcp.sh
-```
-
-Do not double-click the stdio launchers above. `stdio` is for MCP clients and expects JSON-RPC messages on stdin.
-
-For manual Windows use, open CMD or PowerShell first, then run the command from that terminal.
 
 > [!TIP]
-> **Recommended for MCP Client Configurations (like Claude Desktop / VS Code / Cursor)**:
-> Run python directly with `-m ai_agent_standards_mcp` within the virtual environment `.venv` for the most robust cross-platform Stdio setup. This avoids shell-wrapper anomalies (such as PowerShell pipeline newlines).
->
-> **Linux / macOS configuration**:
-> ```json
-> {
->   "mcpServers": {
->     "ai-agent-standards-mcp": {
->       "command": "/absolute/path/to/repo/.venv/bin/python",
->       "args": ["-m", "ai_agent_standards_mcp"],
->       "env": {
->         "PYTHONPATH": "/absolute/path/to/repo/src"
->       }
->     }
->   }
-> }
-> ```
->
-> **Windows configuration**:
-> ```json
-> {
->   "mcpServers": {
->     "ai-agent-standards-mcp": {
->       "command": "C:\\absolute\\path\\to\\repo\\.venv\\Scripts\\python.exe",
->       "args": ["-m", "ai_agent_standards_mcp"],
->       "env": {
->         "PYTHONPATH": "C:\\absolute\\path\\to\\repo\\src"
->       }
->     }
->   }
-> }
-> ```
+> Để trỏ server sang một thư mục standards khác, set biến môi trường:
+> `AI_AGENT_STANDARDS_ROOT=/path/to/AI-Agent-Standards`
 
-By default the server uses stdio transport and indexes the bundled standards
-corpus in this repository. To point at another standards checkout:
+---
 
+## Quick Example
+
+Test nhanh với MCP Inspector:
 ```bash
-$env:AI_AGENT_STANDARDS_ROOT="C:\path\to\AI-Agent-Standards"
-python -m ai_agent_standards_mcp
+npx @modelcontextprotocol/inspector .venv/bin/python -m ai_agent_standards_mcp
 ```
+Mở URL in ra (thường là `http://localhost:5173`) để gọi thử các tools và xem prompts.
 
+---
 
 ## MCP Surface
 
-Resources:
+### Tools
+| Tool | Description |
+|---|---|
+| `list_entries(category, kind)` | Liệt kê toàn bộ nội dung đã index |
+| `get_entry(identifier)` | Lấy nội dung theo slug / tên skill / path |
+| `search_entries(query, limit, kind)` | Tìm kiếm theo từ khoá |
+| `recommend_context(task, limit)` | Gợi ý standards & skills phù hợp với task |
 
-- `standards://manifest` - JSON catalog summary.
-- `standards://document/{slug}` - Markdown standards and framework documents.
-- `standards://skill/{name}` - On-demand skill capsules.
+### Prompts (Slash Commands)
+| Prompt | AWF Command | Mô tả |
+|---|---|---|
+| `apply_standards` | – | Sinh work prompt chuẩn hoá |
+| `review_ai_code` | – | Review code theo framework |
+| `init` | `/init` | Khởi tạo project mới |
+| `plan` | `/plan` | Lên kế hoạch tính năng |
+| `design` | `/design` | Kiến trúc kỹ thuật |
+| `visualize` | `/visualize` | Mockup UI/UX |
+| `code` | `/code` | Triển khai code chất lượng cao |
+| `run` | `/run` | Kiểm tra môi trường chạy |
+| `test` | `/test` | Viết và chạy test |
+| `deploy` | `/deploy` | Kiểm tra an toàn trước khi deploy |
+| `debug` | `/debug` | Debug có hệ thống |
+| `refactor` | `/refactor` | Refactor an toàn |
+| `audit` | `/audit` | Audit bảo mật & sức khoẻ |
+| `rollback` | `/rollback` | Rollback khẩn cấp |
+| `recap` | `/recap` | Khôi phục context workspace |
 
-Tools:
+### Resources
+- `standards://manifest` — JSON catalog tổng quan
+- `standards://document/{slug}` — Tài liệu standards / framework
+- `standards://skill/{name}` — Skill capsule theo yêu cầu
 
-- `list_entries(category=None, kind=None)` - list indexed content.
-- `get_entry(identifier)` - fetch content by slug, skill name, agent key, or path.
-- `search_entries(query, limit=10, kind=None)` - keyword search with snippets.
-- `recommend_context(task, limit=8)` - recommend standards and skills for a task.
+---
 
-Prompts:
+## Project Tree
 
-- `apply_standards(task, focus="general")` - produce a standards-aware work prompt.
-- `review_ai_code(scope="the current diff")` - produce a review prompt grounded in the framework.
-- `init(project_name="")` - start a new project workflow (AWF `/init`).
-- `plan(task)` - plan a feature design (AWF `/plan`).
-- `design(feature)` - technical architecture design (AWF `/design`).
-- `visualize(ui_description="")` - UI/UX mockup design (AWF `/visualize`).
-- `code(task)` - high-quality coding implementation (AWF `/code`).
-- `run(environment="local")` - launch/run application checks (AWF `/run`).
-- `test(test_target="")` - test code & write test suites (AWF `/test`).
-- `deploy(target="production")` - product deployment safety checks (AWF `/deploy`).
-- `debug(error_message)` - systematic debugging protocol (AWF `/debug`).
-- `refactor(target_file)` - safe code refactoring guidelines (AWF `/refactor`).
-- `audit(scope="security")` - health & security audits (AWF `/audit`).
-- `rollback(revision="")` - emergency state rollback (AWF `/rollback`).
-- `recap(session_id="")` - workspace context restoration (AWF `/recap`).
+```
+AI-Agent-Standards-mcp/
+├── ai-agent-standards/          # Corpus chuẩn hoá chính
+│   ├── compliance/              # Checklist tuân thủ (A11Y, COMPLIANCE)
+│   ├── engineering-practices/   # Docs, testing, release process
+│   ├── multi-agent/             # Prompt cho từng vai trò agent
+│   ├── onboarding/              # Hướng dẫn cho agent mới
+│   ├── principles/              # Karpathy framework
+│   ├── prompts/                 # Template prompt & sample use-cases
+│   ├── quality-control/         # Checklist review, CI/CD gates
+│   ├── reference/               # Glossary, error reference
+│   ├── risk-management/         # Security, escalation, failure log
+│   ├── CHANGELOG.md
+│   └── INDEX.md
+├── docs/
+│   ├── images/                  # Ảnh tài liệu (architecture-flowchart.png)
+│   ├── SKILLS_OVERVIEW.md       # Danh sách tất cả skills (auto-generated)
+│   ├── repo-map-for-agents.md
+│   └── rules-generation.md
+├── karpathy/                    # Nguyên tắc gốc từ Karpathy
+├── scripts/
+│   ├── generate-skills-overview.py
+│   ├── install-mcp.py
+│   ├── run-mcp.cmd / .ps1 / .sh / .py
+├── skills/                      # Skill capsules (mỗi thư mục = 1 skill)
+│   └── <skill-name>/SKILL.md
+├── src/ai_agent_standards_mcp/  # Source code MCP server
+│   ├── server.py                # FastMCP server & tool/prompt definitions
+│   ├── catalog.py               # Logic index & tìm kiếm nội dung
+│   ├── paths.py                 # Phát hiện đường dẫn corpus
+│   ├── text.py                  # Tiện ích xử lý văn bản
+│   └── __main__.py              # Entry point
+├── tests/                       # Unit tests
+├── LICENSE
+├── PROJECT-STANDARDS.md         # Chuẩn riêng của project (tuỳ chỉnh)
+├── pyproject.toml
+├── README.md
+└── SKILL-REFERENCE.md           # Tham chiếu nhanh toàn bộ skills
+```
 
-### How to Invoke Prompts (Slash Commands) in MCP Clients
-
-- **Claude Desktop**: Type `/` in the chat input box to show the list of available slash command prompts (e.g., `/plan`, `/code`, `/debug`). Select the prompt, fill in its arguments, and run.
-- **VS Code & Cursor Extensions (Cline / Roo-Code)**:
-  - Access registered prompts directly via the MCP Prompts UI list.
-  - Or, instruct the agent directly in the chat, for example: *"Chạy prompt `plan` thiết kế hệ thống đăng nhập"* (Run prompt `plan` to design login system) or *"Gọi prompt `debug` lỗi database connection refused"*.
-- **Auto-Discovery**: Since individual detailed skills (like `accessibility`, `api-design`, etc.) are registered as resources and tools, the AI agent will automatically search and load them on-demand when it detects matching keywords in your prompt. You do not need to manually call them most of the time.
-
-#### Forcing Auto-Discovery in VS Code Extensions (Cline, Roo-Code, Cursor)
-
-If your VS Code AI agent doesn't automatically call the MCP tools, you can force it by configuring its **Custom System Prompt** or **Custom Instructions**:
-
-1. **In Cline / Roo-Code Settings:** Add this instruction to the *Custom System Prompt* field:
-   ```text
-   Before starting any coding, refactoring, or debugging task, you MUST invoke the `recommend_context(task)` tool from the `ai-agent-standards` MCP server. You must use the returned standards and skills to ground your work.
-   ```
-2. **In Cursor (.cursorrules):** Add the same directive to your project's custom rules or global settings.
-3. **Keyword triggers:** Alternatively, always start your prompt with keywords related to the skills (e.g. "Run a security audit on..." or "Check accessibility of...") to trigger auto-discovery.
-
-
-## Bundled Corpus
-
-The repository carries its own copy of:
-
-- `skills/` - on-demand skill capsules.
-- `ai-agent-standards/` - standards, prompts, compliance, and review docs.
-- `karpathy/` - core principle source files.
-- `docs/` - maintainer-facing notes for the standards corpus.
-
-Wheel builds include this corpus under the package's bundled data fallback, while
-editable/source checkouts index the top-level files directly.
-
-Direct agent instruction files are intentionally excluded from this MCP-only
-distribution.
+---
 
 ## Development
 
@@ -196,5 +160,4 @@ distribution.
 python -m pytest
 ```
 
-The test suite covers catalog discovery, lookup, search, and task-context
-recommendations without needing to launch an MCP client.
+Test suite bao gồm: catalog discovery, lookup, search, và task-context recommendation — không cần khởi động MCP client.
