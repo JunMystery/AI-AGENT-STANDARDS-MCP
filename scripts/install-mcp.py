@@ -28,47 +28,77 @@ def main():
     print("Installing packages and dependencies in editable mode...")
     subprocess.run([str(pip_exe), "install", "-e", "."], cwd=str(repo_root), check=True)
     
-    # 3. Locate Claude Desktop config
+    # 3. Locate and configure targets
     if sys.platform == "win32":
-        claude_config_path = Path(os.environ.get("APPDATA", "")) / "Claude" / "claude_desktop_config.json"
+        appdata = Path(os.environ.get("APPDATA", ""))
+        claude_path = appdata / "Claude" / "claude_desktop_config.json"
+        code_path = appdata / "Code" / "User" / "globalStorage"
+        cursor_path = appdata / "Cursor" / "User" / "globalStorage"
     elif sys.platform == "darwin":
-        claude_config_path = Path.home() / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
+        home = Path.home()
+        claude_path = home / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
+        code_path = home / "Library" / "Application Support" / "Code" / "User" / "globalStorage"
+        cursor_path = home / "Library" / "Application Support" / "Cursor" / "User" / "globalStorage"
     else: # Linux
-        claude_config_path = Path.home() / ".config" / "Claude" / "claude_desktop_config.json"
-        
-    print(f"Locating Claude Desktop config at: {claude_config_path}")
+        home = Path.home()
+        claude_path = home / ".config" / "Claude" / "claude_desktop_config.json"
+        code_path = home / ".config" / "Code" / "User" / "globalStorage"
+        cursor_path = home / ".config" / "Cursor" / "User" / "globalStorage"
+
+    targets = []
+    # Always attempt to configure Claude Desktop (create folders if missing)
+    targets.append(("Claude Desktop", claude_path, True))
+
+    # Cline & Roo-Code for VS Code and Cursor
+    extensions = [
+        ("VS Code Cline", code_path / "saoudrizwan.claude-dev" / "settings" / "cline_mcp_settings.json"),
+        ("VS Code Roo-Code", code_path / "roovet.roo-cline" / "settings" / "cline_mcp_settings.json"),
+        ("Cursor Cline", cursor_path / "saoudrizwan.claude-dev" / "settings" / "cline_mcp_settings.json"),
+        ("Cursor Roo-Code", cursor_path / "roovet.roo-cline" / "settings" / "cline_mcp_settings.json"),
+    ]
     
-    # Load or initialize config
-    config = {}
-    if claude_config_path.exists():
-        try:
-            config = json.loads(claude_config_path.read_text(encoding="utf-8"))
-        except Exception as e:
-            print(f"Warning: Failed to read existing config: {e}. Starting fresh.")
+    for name, path, *rest in [e + (False,) for e in extensions]:
+        # Only configure if the parent directory exists (extension is installed)
+        if path.parent.parent.exists():
+            targets.append((name, path, False))
+
+    print("\nConfiguring MCP Clients...")
+    for name, path, force_create in targets:
+        print(f"  Configuring {name}...")
+        
+        # Load or initialize config
+        config = {}
+        if path.exists():
+            try:
+                config = json.loads(path.read_text(encoding="utf-8"))
+            except Exception as e:
+                print(f"    Warning: Failed to read existing config: {e}. Starting fresh.")
+                
+        if "mcpServers" not in config:
+            config["mcpServers"] = {}
             
-    if "mcpServers" not in config:
-        config["mcpServers"] = {}
-        
-    # Configure the server using direct venv python execution (Option A)
-    pythonpath = str(repo_root / "src")
-    config["mcpServers"]["ai-agent-standards-mcp"] = {
-        "command": str(python_exe),
-        "args": ["-m", "ai_agent_standards_mcp"],
-        "env": {
-            "PYTHONPATH": pythonpath
+        # Configure the server using direct venv python execution (Option A)
+        pythonpath = str(repo_root / "src")
+        config["mcpServers"]["ai-agent-standards-mcp"] = {
+            "command": str(python_exe),
+            "args": ["-m", "ai_agent_standards_mcp"],
+            "env": {
+                "PYTHONPATH": pythonpath
+            }
         }
-    }
-    
-    # Write back config
-    try:
-        claude_config_path.parent.mkdir(parents=True, exist_ok=True)
-        claude_config_path.write_text(json.dumps(config, indent=2), encoding="utf-8")
-        print(f"Successfully configured Claude Desktop! Added 'ai-agent-standards-mcp' server.")
-    except Exception as e:
-        print(f"Error writing Claude config file: {e}")
         
+        # Write back config
+        try:
+            if force_create:
+                path.parent.mkdir(parents=True, exist_ok=True)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(config, indent=2), encoding="utf-8")
+            print(f"    Success: Configured 'ai-agent-standards-mcp' server.")
+        except Exception as e:
+            print(f"    Error: Failed to write config file: {e}")
+            
     print("\n=== Installation Completed Successfully! ===")
-    print("Restart your Claude Desktop client to start using the server.")
+    print("Restart your IDE / MCP Client to start using the server.")
 
 if __name__ == "__main__":
     main()
