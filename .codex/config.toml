@@ -1,5 +1,0 @@
-[mcp_servers.agent-guidance-mcp]
-command = "C:\\Git\\Agent-Guidance-MCP\\.venv\\Scripts\\python.exe"
-args = ["-m", "agent_guidance_mcp"]
-env = { PYTHONPATH = "C:\\Git\\Agent-Guidance-MCP\\src" }
-

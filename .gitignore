@@ -18,3 +18,8 @@ venv/
 !.env.example
 
 tests/
+
+# Local editor/agent config
+.codex/
+.vscode/
+rtk-develop/
