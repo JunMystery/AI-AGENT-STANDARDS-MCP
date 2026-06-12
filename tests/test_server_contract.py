@@ -147,3 +147,19 @@ def test_create_server_initialization(monkeypatch):
 
     assert mcp.name == "AI Agent Standards"
     assert mcp.kwargs["json_response"] is True
+
+
+def test_prompts_can_be_called_without_arguments():
+    catalog = build_catalog(ROOT)
+    mcp = FakeMCP()
+    register_handlers(mcp, catalog)
+
+    # These prompts previously had required arguments with no defaults.
+    # We verify they can now be executed without parameters.
+    assert "Apply AI-Coding-Standards" in mcp.prompts["apply_standards"]()
+    assert mcp.prompts["plan"]() is not None
+    assert mcp.prompts["design"]() is not None
+    assert mcp.prompts["code"]() is not None
+    assert mcp.prompts["debug"]() is not None
+    assert mcp.prompts["refactor"]() is not None
+

@@ -121,9 +121,9 @@ def register_handlers(mcp: Any, catalog: StandardsCatalog) -> None:
         )
 
     @mcp.prompt()
-    def apply_standards(task: str, focus: str = "general") -> str:
+    def apply_standards(task: str = "", focus: str = "general") -> str:
         """Generate a standards-aware prompt for a coding task."""
-        recommendations = catalog.recommend_context(f"{focus} {task}", limit=6)
+        recommendations = catalog.recommend_context(f"{focus} {task}".strip(), limit=6)
         lines = [
             "Apply AI-Coding-Standards v3.1.0 while completing this task.",
             "",
@@ -175,16 +175,20 @@ def register_handlers(mcp: Any, catalog: StandardsCatalog) -> None:
         return content
 
     @mcp.prompt()
-    def plan(task: str) -> str:
+    def plan(task: str = "") -> str:
         """Plan feature designs."""
         content = catalog.read_entry("workflow-plan")
-        return f"{content}\n\nTask to plan: {task}"
+        if task:
+            return f"{content}\n\nTask to plan: {task}"
+        return content
 
     @mcp.prompt()
-    def design(feature: str) -> str:
+    def design(feature: str = "") -> str:
         """Technical design for features."""
         content = catalog.read_entry("workflow-design")
-        return f"{content}\n\nFeature to design: {feature}"
+        if feature:
+            return f"{content}\n\nFeature to design: {feature}"
+        return content
 
     @mcp.prompt()
     def visualize(ui_description: str = "") -> str:
@@ -195,10 +199,12 @@ def register_handlers(mcp: Any, catalog: StandardsCatalog) -> None:
         return content
 
     @mcp.prompt()
-    def code(task: str) -> str:
+    def code(task: str = "") -> str:
         """Implement high-quality features."""
         content = catalog.read_entry("workflow-code")
-        return f"{content}\n\nTask to implement:\n{task}"
+        if task:
+            return f"{content}\n\nTask to implement:\n{task}"
+        return content
 
     @mcp.prompt()
     def run(environment: str = "local") -> str:
@@ -221,16 +227,20 @@ def register_handlers(mcp: Any, catalog: StandardsCatalog) -> None:
         return f"{content}\n\nDeploy target: {target}"
 
     @mcp.prompt()
-    def debug(error_message: str) -> str:
+    def debug(error_message: str = "") -> str:
         """Analyze and fix bugs automatically."""
         content = catalog.read_entry("workflow-debug")
-        return f"{content}\n\nError/Bug Description:\n{error_message}"
+        if error_message:
+            return f"{content}\n\nError/Bug Description:\n{error_message}"
+        return content
 
     @mcp.prompt()
-    def refactor(target_file: str) -> str:
+    def refactor(target_file: str = "") -> str:
         """Optimize and refactor code safely."""
         content = catalog.read_entry("workflow-refactor")
-        return f"{content}\n\nFile or module to refactor: {target_file}"
+        if target_file:
+            return f"{content}\n\nFile or module to refactor: {target_file}"
+        return content
 
     @mcp.prompt()
     def audit(scope: str = "security") -> str:
