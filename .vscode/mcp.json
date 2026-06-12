@@ -1,9 +1,11 @@
 {
   "servers": {
     "agent-guidance-mcp": {
-      "type": "stdio",
-      "command": "${workspaceFolder}/.venv/bin/python",
-      "args": ["-m", "agent_guidance_mcp"],
+      "command": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "args": [
+        "-m",
+        "agent_guidance_mcp"
+      ],
       "env": {
         "PYTHONPATH": "${workspaceFolder}/src"
       }

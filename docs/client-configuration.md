@@ -10,22 +10,22 @@ The repository includes a workspace MCP settings file under `.vscode/mcp.json`.
 
 When you open this repository in VS Code with GitHub Copilot installed:
 
-1. Run the installer to create `.venv`.
+1. Run the installer (`python scripts/install-mcp.py`) to create `.venv` and automatically configure both `.vscode/mcp.json` and your global VS Code user config (`mcp.json`).
 2. Open the repository folder in VS Code.
 3. Let VS Code detect the MCP server from `.vscode/mcp.json`.
 4. Trust the server when prompted.
 5. Use the tools and prompts from Copilot Chat.
 
-By default, `.vscode/mcp.json` points to the Linux/macOS Python path:
+By default, running the installer script automatically configures `.vscode/mcp.json` with the correct path for your platform:
 
-```json
-"command": "${workspaceFolder}/.venv/bin/python"
-```
-
-On Windows, change it to:
-
+On Windows:
 ```json
 "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+```
+
+On Linux/macOS:
+```json
+"command": "${workspaceFolder}/.venv/bin/python"
 ```
 
 ## Generic MCP Client Config
@@ -65,7 +65,7 @@ Windows:
 - Claude Desktop typically uses a global MCP config file.
 - Cursor can use a native MCP config or extension-specific MCP settings.
 - Gemini-compatible tools can use a JSON MCP config under the user's Gemini configuration directory.
-- Codex can use an MCP server entry in `~/.codex/config.toml`.
+- Codex can use an MCP server entry in `~/.codex/config.toml` (global) and `.codex/config.toml` (project-local).
 
 The bundled `scripts/install-mcp.py` attempts to configure several common clients automatically.
 

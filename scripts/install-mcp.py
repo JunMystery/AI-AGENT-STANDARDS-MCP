@@ -70,6 +70,14 @@ def main():
     cursor_native_path = Path.home() / ".cursor" / "mcp.json"
     targets.append(("Cursor Native", cursor_native_path, True))
 
+    # VS Code Native User config path (cross-platform)
+    vscode_native_user_path = code_path.parent / "mcp.json"
+    targets.append(("VS Code Native (User)", vscode_native_user_path, True))
+
+    # VS Code Native Workspace config path
+    vscode_native_workspace_path = repo_root / ".vscode" / "mcp.json"
+    targets.append(("VS Code Native (Workspace)", vscode_native_workspace_path, True))
+
     # Cline & Roo-Code for VS Code and Cursor
     extensions = [
         ("VS Code Cline", code_path / "saoudrizwan.claude-dev" / "settings" / "cline_mcp_settings.json"),
@@ -95,22 +103,33 @@ def main():
             except Exception as e:
                 print(f"    Warning: Failed to read existing config: {e}. Starting fresh.")
                 
-        if "mcpServers" not in config:
-            config["mcpServers"] = {}
+        # VS Code native configuration (both user and workspace mcp.json) uses "servers".
+        is_vscode_native = "VS Code Native" in name
+        config_key = "servers" if is_vscode_native else "mcpServers"
+
+        if config_key not in config:
+            config[config_key] = {}
             
-        # Configure the server using direct venv python execution (Option A)
-        pythonpath = str(repo_root / "src")
-        legacy_config = config["mcpServers"].get(LEGACY_SERVER_ID)
+        # Determine command and env PYTHONPATH to write
+        if name == "VS Code Native (Workspace)":
+            python_exe_str = "${workspaceFolder}/.venv/Scripts/python.exe" if os.name == "nt" else "${workspaceFolder}/.venv/bin/python"
+            pythonpath_str = "${workspaceFolder}/src"
+        else:
+            python_exe_str = str(python_exe)
+            pythonpath_str = str(repo_root / "src")
+
+        legacy_config = config[config_key].get(LEGACY_SERVER_ID)
         if legacy_config is not None and owns_json_server_config(legacy_config):
-            config["mcpServers"].pop(LEGACY_SERVER_ID)
-            print(f"    Migrated legacy '{LEGACY_SERVER_ID}' config to '{SERVER_ID}'.")
+            config[config_key].pop(LEGACY_SERVER_ID)
+            print(f"    Migrated legacy '{LEGACY_SERVER_ID}' config to '{SERVER_ID}' in {config_key}.")
         elif legacy_config is not None:
             print(f"    Left custom legacy '{LEGACY_SERVER_ID}' config unchanged.")
-        config["mcpServers"][SERVER_ID] = {
-            "command": str(python_exe),
+            
+        config[config_key][SERVER_ID] = {
+            "command": python_exe_str,
             "args": ["-m", MODULE_NAME],
             "env": {
-                "PYTHONPATH": pythonpath
+                "PYTHONPATH": pythonpath_str
             }
         }
         
@@ -131,8 +150,10 @@ def main():
     print("Restart your IDE / MCP Client to start using the server.")
 
 def configure_codex(python_exe, repo_root):
-    codex_dir = Path.home() / ".codex"
-    config_path = codex_dir / "config.toml"
+    targets = [
+        ("Global Codex config", Path.home() / ".codex" / "config.toml"),
+        ("Project-local Codex config", repo_root / ".codex" / "config.toml")
+    ]
     
     python_exe_str = str(python_exe).replace("\\", "\\\\")
     pythonpath_str = str(repo_root / "src").replace("\\", "\\\\")
@@ -145,62 +166,63 @@ def configure_codex(python_exe, repo_root):
         ""
     ]
     
-    print("  Configuring Codex...")
-    try:
-        codex_dir.mkdir(parents=True, exist_ok=True)
-        content = ""
-        if config_path.exists():
-            content = config_path.read_text(encoding="utf-8")
-            
-        # Parse and replace owned legacy/current blocks while preserving unrelated blocks.
-        lines = content.splitlines()
-        new_lines = []
-        block_found = False
-
-        def matching_server_id(header):
-            if header == f"[mcp_servers.{SERVER_ID}]":
-                return SERVER_ID
-            if header == f"[mcp_servers.{LEGACY_SERVER_ID}]":
-                return LEGACY_SERVER_ID
-            return None
-
-        index = 0
-        while index < len(lines):
-            line = lines[index]
-            stripped = line.strip()
-            server_id = matching_server_id(stripped)
-            if server_id is None:
-                new_lines.append(line)
+    for name, config_path in targets:
+        print(f"  Configuring {name}...")
+        try:
+            config_path.parent.mkdir(parents=True, exist_ok=True)
+            content = ""
+            if config_path.exists():
+                content = config_path.read_text(encoding="utf-8")
+                
+            # Parse and replace owned legacy/current blocks while preserving unrelated blocks.
+            lines = content.splitlines()
+            new_lines = []
+            block_found = False
+    
+            def matching_server_id(header):
+                if header == f"[mcp_servers.{SERVER_ID}]":
+                    return SERVER_ID
+                if header == f"[mcp_servers.{LEGACY_SERVER_ID}]":
+                    return LEGACY_SERVER_ID
+                return None
+    
+            index = 0
+            while index < len(lines):
+                line = lines[index]
+                stripped = line.strip()
+                server_id = matching_server_id(stripped)
+                if server_id is None:
+                    new_lines.append(line)
+                    index += 1
+                    continue
+    
+                block_lines = [line]
                 index += 1
-                continue
-
-            block_lines = [line]
-            index += 1
-            while index < len(lines) and not lines[index].strip().startswith("["):
-                block_lines.append(lines[index])
-                index += 1
-
-            block_text = "\n".join(block_lines)
-            if (
-                server_id == SERVER_ID
-                or MODULE_NAME in block_text
-                or LEGACY_MODULE_NAME in block_text
-            ):
-                if not block_found:
-                    block_found = True
-                    new_lines.extend(new_block[:-1]) # add new block without the trailing newline
-                continue
-            new_lines.extend(block_lines)
-            
-        if not block_found:
-            if new_lines and new_lines[-1] != "":
-                new_lines.append("")
-            new_lines.extend(new_block)
-            
-        config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-        print(f"    Success: Configured '{SERVER_ID}' server in Codex config.toml.")
-    except Exception as e:
-        print(f"    Error: Failed to configure Codex: {e}")
+                while index < len(lines) and not lines[index].strip().startswith("["):
+                    block_lines.append(lines[index])
+                    index += 1
+    
+                block_text = "\n".join(block_lines)
+                if (
+                    server_id == SERVER_ID
+                    or MODULE_NAME in block_text
+                    or LEGACY_MODULE_NAME in block_text
+                ):
+                    if not block_found:
+                        block_found = True
+                        new_lines.extend(new_block[:-1]) # add new block without the trailing newline
+                    continue
+                new_lines.extend(block_lines)
+                
+            if not block_found:
+                if new_lines and new_lines[-1] != "":
+                    new_lines.append("")
+                new_lines.extend(new_block)
+                
+            config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+            print(f"    Success: Configured '{SERVER_ID}' server in {name}.")
+        except Exception as e:
+            print(f"    Error: Failed to configure {name}: {e}")
 
 if __name__ == "__main__":
     main()
