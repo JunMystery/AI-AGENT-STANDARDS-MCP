@@ -1,11 +1,11 @@
-# AI Agent Standards MCP (v3.0.0)
+# AI Agent Standards MCP (v3.0.3)
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Version](https://img.shields.io/badge/mcp-%3E%3D1.0.0-green)](https://modelcontextprotocol.io/)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](#development)
 
-MCP server phục vụ bộ chuẩn AI Agent Coding Standards và skill set v3.0.0 qua giao thức **Stdio** (không cần HTTP).
+MCP server serving the AI Agent Coding Standards corpus and skill set v3.0.3 over **Stdio** transport (no HTTP required).
 
 ![AI Agent Standards MCP Architecture Flowchart](docs/images/architecture-flowchart.png)
 
@@ -22,15 +22,32 @@ python  scripts/install-mcp.py        # Windows
 **Manual:**
 ```bash
 python -m venv .venv
-.venv/bin/pip install -e ".[dev]"     # Linux / macOS
-.venv\Scripts\pip install -e ".[dev]" # Windows
+.venv/bin/pip install -e ".[dev]"      # Linux / macOS
+.venv\Scripts\pip install -e ".[dev]"  # Windows
 ```
 
 ---
 
 ## MCP Client Config
 
-Add to your MCP client config (Claude Desktop, VS Code, Cursor…):
+### VS Code & GitHub Copilot (Automatic Workspace Discovery)
+We have included a preconfigured workspace MCP settings file under `.vscode/mcp.json`.
+When you open this repository in VS Code with GitHub Copilot installed:
+1. Ensure you have run the installation script to create the `.venv` directory.
+2. VS Code will automatically detect the MCP server listed in `.vscode/mcp.json`.
+3. You will be prompted to trust the server. Once approved, the tools and prompts will be available directly in GitHub Copilot Chat.
+
+> [!NOTE]
+> By default, `.vscode/mcp.json` points to the Linux/macOS Python path (`.venv/bin/python`).
+> If you are on **Windows**, edit `.vscode/mcp.json` to change the command path to point to the Windows executable:
+> ```json
+> "command": "${workspaceFolder}/.venv/Scripts/python.exe"
+> ```
+
+---
+
+### Other MCP Clients (Claude Desktop, Cursor, etc.)
+Manually add the following configurations to your global MCP client settings:
 
 **Linux / macOS**
 ```json
@@ -59,18 +76,18 @@ Add to your MCP client config (Claude Desktop, VS Code, Cursor…):
 ```
 
 > [!TIP]
-> Để trỏ server sang một thư mục standards khác, set biến môi trường:
+> To point the server to a different standards folder, set the environment variable:
 > `AI_AGENT_STANDARDS_ROOT=/path/to/AI-Agent-Standards`
 
 ---
 
 ## Quick Example
 
-Test nhanh với MCP Inspector:
+Verify the server locally using the MCP Inspector:
 ```bash
 npx @modelcontextprotocol/inspector .venv/bin/python -m ai_agent_standards_mcp
 ```
-Mở URL in ra (thường là `http://localhost:5173`) để gọi thử các tools và xem prompts.
+Open the printed URL (usually `http://localhost:5173`) in your browser to interactively test tools and prompts.
 
 ---
 
@@ -79,34 +96,34 @@ Mở URL in ra (thường là `http://localhost:5173`) để gọi thử các to
 ### Tools
 | Tool | Description |
 |---|---|
-| `list_entries(category, kind)` | Liệt kê toàn bộ nội dung đã index |
-| `get_entry(identifier)` | Lấy nội dung theo slug / tên skill / path |
-| `search_entries(query, limit, kind)` | Tìm kiếm theo từ khoá |
-| `recommend_context(task, limit)` | Gợi ý standards & skills phù hợp với task |
+| `list_entries(category, kind)` | List all indexed standards and skills content |
+| `get_entry(identifier)` | Retrieve specific content by slug, skill name, or path |
+| `search_entries(query, limit, kind)` | Perform full-text search with match snippets |
+| `recommend_context(task, limit)` | Recommend relevant standards and skills for a given task |
 
 ### Prompts (Slash Commands)
-| Prompt | AWF Command | Mô tả |
+| Prompt | AWF Command | Description |
 |---|---|---|
-| `apply_standards` | – | Sinh work prompt chuẩn hoá |
-| `review_ai_code` | – | Review code theo framework |
-| `init` | `/init` | Khởi tạo project mới |
-| `plan` | `/plan` | Lên kế hoạch tính năng |
-| `design` | `/design` | Kiến trúc kỹ thuật |
-| `visualize` | `/visualize` | Mockup UI/UX |
-| `code` | `/code` | Triển khai code chất lượng cao |
-| `run` | `/run` | Kiểm tra môi trường chạy |
-| `test` | `/test` | Viết và chạy test |
-| `deploy` | `/deploy` | Kiểm tra an toàn trước khi deploy |
-| `debug` | `/debug` | Debug có hệ thống |
-| `refactor` | `/refactor` | Refactor an toàn |
-| `audit` | `/audit` | Audit bảo mật & sức khoẻ |
-| `rollback` | `/rollback` | Rollback khẩn cấp |
-| `recap` | `/recap` | Khôi phục context workspace |
+| `apply_standards` | – | Generate a standards-aware system instructions prompt |
+| `review_ai_code` | – | Review code against the Karpathy principles framework |
+| `init` | `/init` | Initialize a new project workflow |
+| `plan` | `/plan` | Plan feature design and workflow layout |
+| `design` | `/design` | Technical architectural design guidelines |
+| `visualize` | `/visualize` | Create UI/UX Mockups and design guides |
+| `code` | `/code` | Write high-quality compliant code implementations |
+| `run` | `/run` | Build, run, and verify the application environment |
+| `test` | `/test` | Write and execute unit/integration test suites |
+| `deploy` | `/deploy` | Check safety checklists before deployment |
+| `debug` | `/debug` | Systematic troubleshooting and error-solving protocol |
+| `refactor` | `/refactor` | Safe code refactoring instructions |
+| `audit` | `/audit` | Execute security and system-health audits |
+| `rollback` | `/rollback` | Execute emergency recovery/rollback steps |
+| `recap` | `/recap` | Rebuild workspace and context session state |
 
 ### Resources
-- `standards://manifest` — JSON catalog tổng quan
-- `standards://document/{slug}` — Tài liệu standards / framework
-- `standards://skill/{name}` — Skill capsule theo yêu cầu
+- `standards://manifest` — Catalog outline containing all available documents
+- `standards://document/{slug}` — Core standards and framework manuals
+- `standards://skill/{name}` — On-demand skill capsules
 
 ---
 
@@ -114,42 +131,44 @@ Mở URL in ra (thường là `http://localhost:5173`) để gọi thử các to
 
 ```
 AI-Agent-Standards-mcp/
-├── ai-agent-standards/          # Corpus chuẩn hoá chính
-│   ├── compliance/              # Checklist tuân thủ (A11Y, COMPLIANCE)
-│   ├── engineering-practices/   # Docs, testing, release process
-│   ├── multi-agent/             # Prompt cho từng vai trò agent
-│   ├── onboarding/              # Hướng dẫn cho agent mới
-│   ├── principles/              # Karpathy framework
-│   ├── prompts/                 # Template prompt & sample use-cases
-│   ├── quality-control/         # Checklist review, CI/CD gates
-│   ├── reference/               # Glossary, error reference
-│   ├── risk-management/         # Security, escalation, failure log
+├── .vscode/
+│   └── mcp.json                 # Automatic VS Code/Copilot MCP server discovery config
+├── ai-agent-standards/          # Core standards corpus
+│   ├── compliance/              # Checklists for accessibility and guidelines compliance
+│   ├── engineering-practices/   # Best practices on testing, documenting, and releasing
+│   ├── multi-agent/             # Prompts tailored for various agent roles
+│   ├── onboarding/              # Guides to familiarize new agents with workflows
+│   ├── principles/              # Foundation rules based on Karpathy framework
+│   ├── prompts/                 # Standardized system prompts and cookbooks
+│   ├── quality-control/         # Self-checking templates and review practices
+│   ├── reference/               # Glossary and complete error index
+│   ├── risk-management/         # Security boundaries and escalations
 │   ├── CHANGELOG.md
 │   └── INDEX.md
 ├── docs/
-│   ├── images/                  # Ảnh tài liệu (architecture-flowchart.png)
-│   ├── SKILLS_OVERVIEW.md       # Danh sách tất cả skills (auto-generated)
+│   ├── images/                  # Media assets (flowcharts, diagrams)
+│   ├── SKILLS_OVERVIEW.md       # Auto-generated index listing all active skills
 │   ├── repo-map-for-agents.md
 │   └── rules-generation.md
-├── karpathy/                    # Nguyên tắc gốc từ Karpathy
+├── karpathy/                    # Reference documents for Karpathy framework
 ├── scripts/
 │   ├── generate-skills-overview.py
 │   ├── install-mcp.py
-│   ├── run-mcp.cmd / .ps1 / .sh / .py
-├── skills/                      # Skill capsules (mỗi thư mục = 1 skill)
+│   └── run-mcp.cmd / .ps1 / .sh / .py
+├── skills/                      # Custom-scoped capsule folders (each contains SKILL.md)
 │   └── <skill-name>/SKILL.md
-├── src/ai_agent_standards_mcp/  # Source code MCP server
-│   ├── server.py                # FastMCP server & tool/prompt definitions
-│   ├── catalog.py               # Logic index & tìm kiếm nội dung
-│   ├── paths.py                 # Phát hiện đường dẫn corpus
-│   ├── text.py                  # Tiện ích xử lý văn bản
-│   └── __main__.py              # Entry point
-├── tests/                       # Unit tests
-├── LICENSE
-├── PROJECT-STANDARDS.md         # Chuẩn riêng của project (tuỳ chỉnh)
-├── pyproject.toml
-├── README.md
-└── SKILL-REFERENCE.md           # Tham chiếu nhanh toàn bộ skills
+├── src/ai_agent_standards_mcp/  # Python package source code
+│   ├── server.py                # FastMCP configuration and tool declarations
+│   ├── catalog.py               # Memory indexing, search, and categorization logic
+│   ├── paths.py                 # Resolves file paths for standard documents
+│   ├── text.py                  # Text extraction and parsing utilities
+│   └── __main__.py              # Server launcher
+├── tests/                       # Automated Pytest suite
+├── LICENSE                      # License details (MIT)
+├── PROJECT-STANDARDS.md         # Custom project instructions (index-enabled)
+├── pyproject.toml               # Python project configuration
+├── README.md                    # Main repository documentation
+└── SKILL-REFERENCE.md           # Reference map listing all skill categories
 ```
 
 ---
@@ -160,4 +179,4 @@ AI-Agent-Standards-mcp/
 python -m pytest
 ```
 
-Test suite bao gồm: catalog discovery, lookup, search, và task-context recommendation — không cần khởi động MCP client.
+The pytest suite verifies catalog discovery, lookup, searching, and context recommendation features locally.

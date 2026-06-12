@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "ai-agent-standards-mcp": {
+      "type": "stdio",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": ["-m", "ai_agent_standards_mcp"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      }
+    }
+  }
+}
