@@ -84,6 +84,8 @@ Prefer narrow calls:
 - Use `max_lines=120` to `200` for file reads unless a broader range is necessary.
 - Avoid exporting full snapshots for small one-file tasks.
 
+RTK optimization runs in conservative mode by default. It preserves exact file-read content under normal bounded limits and marks any capped structured response with `rtk.truncated=true` plus continuation metadata.
+
 See [Project Context Tools](project-context-tools.md) for details on snapshot freshness and token cost.
 
 ## Related Docs

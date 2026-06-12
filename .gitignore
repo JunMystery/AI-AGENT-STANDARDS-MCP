@@ -18,6 +18,10 @@ venv/
 !.env.example
 
 tests/
+!tests/
+tests/*
+!tests/test_install_mcp.py
+!tests/test_universal_optimization.py
 
 # Local editor/agent config
 .codex/

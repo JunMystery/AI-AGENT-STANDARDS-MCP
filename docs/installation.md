@@ -13,7 +13,22 @@ python3 scripts/install-mcp.py        # Linux / macOS
 python  scripts/install-mcp.py        # Windows
 ```
 
-The installer creates a local `.venv`, installs the package in editable mode, and attempts to configure supported MCP clients.
+The installer creates a local `.venv`, installs the package in editable mode,
+and attempts to configure supported MCP clients. It is safe to re-run after
+pulling repo updates: owned MCP server blocks are refreshed in place, legacy
+`ai-agent-standards-mcp` blocks are migrated when recognized, unrelated servers
+are preserved, and existing config files are backed up before changes.
+
+Useful installer options:
+
+```bash
+python scripts/install-mcp.py --dry-run       # preview config changes only
+python scripts/install-mcp.py --skip-install  # refresh configs without pip install
+python scripts/install-mcp.py --no-backup     # do not create .bak timestamp files
+```
+
+After config updates, the installer runs a startup smoke check with
+`python -m agent_guidance_mcp --show-stats`.
 
 ## Manual Install
 

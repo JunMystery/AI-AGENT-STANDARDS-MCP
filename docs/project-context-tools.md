@@ -15,6 +15,26 @@ Agents often waste tokens by reading unrelated files or guessing the project str
 
 The tools skip common dependency/cache folders, binary files, and generated snapshot output.
 
+## RTK Token Optimization
+
+RTK optimization is enabled by default in conservative mode:
+
+```json
+{
+  "RTK_OPTIMIZATION_ENABLED": "true",
+  "RTK_OPTIMIZATION_LEVEL": "conservative",
+  "RTK_MAX_TOKENS": "12000"
+}
+```
+
+This mode measures all MCP responses but only compacts low-risk/generated payloads when they exceed the configured cap. `read_project_file` keeps exact file content under normal bounded limits. If a hard cap is reached, the response includes `rtk.truncated=true`, omitted counts, and continuation metadata.
+
+Context tools accept optional overrides:
+
+- `rtk_enabled`
+- `rtk_level`
+- `rtk_max_tokens`
+
 ## Agent Instruction Policy
 
 At the start of each coding session, call `recommend_context(task)` and `get_project_tree(project_path)`.
@@ -162,6 +182,8 @@ Use larger values only when the task requires it.
 ```
 
 These limits protect the agent context window, but a snapshot can still be much larger than a targeted search/read workflow.
+
+RTK metadata in structured responses reports estimated `original_tokens`, `optimized_tokens`, `saved_tokens`, strategy, and truncation state. Treat `rtk.truncated=true` as a signal to narrow the request or read the continuation range.
 
 ## Safety Rules
 

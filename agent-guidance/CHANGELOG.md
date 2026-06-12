@@ -2,6 +2,20 @@
 
 Track versions and updates for the AI Agent Coding Standards framework.
 
+## [3.2.0] - 2026-06-12
+
+### Added
+- **Safe universal RTK optimization** - Added a pure-Python MCP response optimizer with conservative defaults, TTL cache, content detection, metrics, and safe truncation metadata for structured responses.
+- **RTK runtime monitoring tools** - Added `get_rtk_stats(detailed)` and `reset_rtk_stats()` for live MCP server optimization telemetry.
+- **Installer re-run update flow** - Hardened `scripts/install-mcp.py` with config backups, merge-safe JSON/TOML updates, stale owned-server cleanup, dry-run/skip-install/no-backup flags, and a startup smoke check.
+
+### Fixed
+- **RTK robustness** - Hardened per-call `rtk_max_tokens` parsing, content-equality based `modified` reporting, and cap accounting when required RTK metadata pushes tiny responses over the configured cap.
+
+### Changed
+- **RTK and installer documentation** - Documented conservative RTK behavior, per-call overrides, CLI startup stats, installer re-run behavior, and runtime stats tooling across the MCP docs.
+- **Version synchronization** - Updated framework and package release surfaces to v3.2.0.
+
 ## [3.1.0] - 2026-06-12
 
 ### Added
@@ -253,6 +267,7 @@ Track versions and updates for the AI Agent Coding Standards framework.
 
 | Version | Date | Changes | Status |
 |---------|------|---------|--------|
+| 3.2.0 | 2026-06-12 | Safe RTK optimization, RTK stats tools, robust installer re-run flow, docs and regression tests | Released |
 | 3.0.3 | 2026-06-11 | Add Cursor Native auto-installation support in scripts/install-mcp.py | Released |
 | 3.0.2 | 2026-06-11 | Add Codex auto-installation support in scripts/install-mcp.py | Released |
 | 3.0.1 | 2026-06-11 | Fix VS Code MCP client activation hang in run-mcp.cmd wrapper script | Released |

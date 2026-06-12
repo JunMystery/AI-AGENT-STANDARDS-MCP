@@ -20,6 +20,8 @@ This page lists the MCP resources, tools, and prompts exposed by the server.
 | `get_entry(identifier)` | Fetch one entry by slug, skill name, agent key, URI, or relative path. |
 | `search_entries(query, limit, kind)` | Search standards entries and return ranked snippets. |
 | `recommend_context(task, limit)` | Recommend standards, skills, and references for a coding task. |
+| `get_rtk_stats(detailed)` | Return RTK optimization metrics for this server process. |
+| `reset_rtk_stats()` | Reset RTK optimization metrics and cache for this server process. |
 
 ## Project Context Tools
 
@@ -29,6 +31,8 @@ This page lists the MCP resources, tools, and prompts exposed by the server.
 | `search_project_code(project_path, query, limit)` | Search project source files and return bounded snippets. |
 | `read_project_file(project_path, relative_path, start_line, max_lines)` | Read a bounded line range from one project text file. |
 | `export_project_snapshot(project_path, output_path, max_file_bytes, max_total_bytes)` | Export bounded project tree and code content for AI agent context. |
+
+Project-context tools also accept optional `rtk_enabled`, `rtk_level`, and `rtk_max_tokens` arguments. Defaults are conservative: exact file-read content is preserved unless a hard RTK cap is hit, and any modified structured response includes an `rtk` metadata field with truncation and token counts.
 
 See [Project Context Tools](project-context-tools.md) for detailed usage and safety notes.
 

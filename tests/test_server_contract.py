@@ -78,6 +78,8 @@ def test_register_handlers_exposes_expected_mcp_contract():
         "get_entry",
         "search_entries",
         "recommend_context",
+        "get_rtk_stats",
+        "reset_rtk_stats",
         "export_project_snapshot",
         "get_project_tree",
         "read_project_file",
@@ -106,12 +108,15 @@ def test_register_handlers_exposes_expected_mcp_contract():
     recommendations = mcp.tools["recommend_context"]("Build a secure API with tests", limit=6)
     project_tree = mcp.tools["get_project_tree"](str(ROOT), max_depth=1)
     prompt = mcp.prompts["apply_standards"]("Build a secure API with tests")
+    stats = mcp.tools["get_rtk_stats"](detailed=True)
 
     assert "# Karpathy Coding Principles" in document
     assert "# Codebase Onboarding" in skill
     assert any("security" in item["path"].lower() for item in recommendations["recommendations"])
     assert any(entry["path"] == "README.md" for entry in project_tree["tree"])
-    assert "Apply AI-Coding-Standards v3.1.0" in prompt
+    assert project_tree["rtk"]["content_type"] == "tree"
+    assert "Apply AI-Coding-Standards v3.2.0" in prompt
+    assert stats["total_actions"] >= 5
 
 
 def test_mcp_prompt_docs_and_catalog_metadata_do_not_expose_legacy_branding():

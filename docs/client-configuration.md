@@ -79,6 +79,20 @@ AGENT_GUIDANCE_ROOT=/path/to/Agent-Guidance
 
 `AI_AGENT_STANDARDS_ROOT` is still accepted as a legacy alias for existing local setups.
 
+RTK optimization can be tuned with:
+
+- `RTK_OPTIMIZATION_ENABLED`: Enable or disable response optimization. Defaults to `true`.
+- `RTK_OPTIMIZATION_LEVEL`: `conservative`, `balanced`, or `aggressive`. Defaults to `conservative`.
+- `RTK_MAX_TOKENS`: Per-response RTK cap. Defaults to `12000`.
+- `RTK_CACHE_ENABLED`: Enable in-process optimized response cache. Defaults to `true`.
+- `RTK_CACHE_TTL`: Cache TTL in seconds. Defaults to `300`.
+- `RTK_AUTO_DETECT`: Enable content-type detection. Defaults to `true`.
+- `RTK_LOG_METRICS`: Enable additional metric logging. Defaults to `false`.
+
+`python -m agent_guidance_mcp --show-stats` prints the resolved RTK settings and
+empty startup stats for a fresh process. Use `get_rtk_stats(detailed)` for live
+runtime metrics from an active MCP server process.
+
 Project-context tools should receive an explicit `project_path` argument. Avoid relying on the MCP process current working directory when scanning a user project.
 
 ## Related Docs

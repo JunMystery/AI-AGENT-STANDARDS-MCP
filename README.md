@@ -1,4 +1,4 @@
-# Agent Guidance MCP (v3.1.0)
+# Agent Guidance MCP (v3.2.0)
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -79,6 +79,11 @@ Project-context tools:
 - `search_project_code(project_path, query, limit)`
 - `read_project_file(project_path, relative_path, start_line, max_lines)`
 - `export_project_snapshot(project_path, output_path, max_file_bytes, max_total_bytes)`
+
+RTK optimization is enabled by default in conservative mode. It measures every MCP
+response and only compacts low-risk/generated payloads when needed; edit-critical
+file reads remain exact under normal bounded limits. Inspect or reset runtime
+metrics with `get_rtk_stats(detailed)` and `reset_rtk_stats()`.
 
 Prompts include `/init`, `/plan`, `/design`, `/code`, `/run`, `/test`, `/deploy`, `/debug`, `/refactor`, `/audit`, `/rollback`, and `/recap`. Full details are in [MCP Surface Reference](docs/mcp-surface.md).
 

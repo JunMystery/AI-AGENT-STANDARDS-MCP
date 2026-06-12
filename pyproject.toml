@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agent-guidance-mcp"
-version = "3.1.0"
+version = "3.2.0"
 description = "MCP server exposing AI agent guidance resources, skills, prompts, and project context tools."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,6 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+optimization = []
 dev = [
   "pytest>=8.0"
 ]
