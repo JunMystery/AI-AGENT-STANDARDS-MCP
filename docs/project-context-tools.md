@@ -15,6 +15,16 @@ Agents often waste tokens by reading unrelated files or guessing the project str
 
 The tools skip common dependency/cache folders, binary files, and generated snapshot output.
 
+## Agent Instruction Policy
+
+At the start of each coding session, call `recommend_context(task)` and `get_project_tree(project_path)`.
+
+For large refactors, upgrades, audits, or unfamiliar code, also use `search_project_code(project_path, query)` and `export_project_snapshot(project_path)` when a reusable overview is useful.
+
+Before editing any file, inspect the current target file with `read_project_file(project_path, relative_path)` or an equivalent file-read tool.
+
+Avoid repeated broad scans during the same session unless the project changed significantly.
+
 ## `get_project_tree`
 
 Returns a bounded source tree for a project.

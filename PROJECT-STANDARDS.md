@@ -30,10 +30,9 @@ This file contains standards, conventions, and rules specific to this project. A
 
 <!-- ADD YOUR STANDARDS BELOW -->
 
-### MCP Skill Auto-Discovery
-- **Rule (Required):** Before starting any implementation, design, refactoring, or debugging task, the AI Agent MUST automatically invoke the `recommend_context(task)` tool from the `ai-agent-standards` MCP server. You must use the returned resources, principles, and skills to ground your work.
-- **Reason (Required):** To ensure all coding activities comply with the 6 Core Principles and local project standards without needing explicit manual user prompts.
-- **Do / Good Example:** Executing `recommend_context("implement rate limiting for Auth API")` at the beginning of the chat session.
-- **Don't / Bad Example:** Coding immediately without consulting the MCP server's standards and context.
-- **How to Test (Optional):** Ask the agent to list the standards/skills it loaded for the current task.
-
+### MCP Context Grounding
+- **Rule (Required):** At the start of each coding session, the AI Agent MUST call `recommend_context(task)` and `get_project_tree(project_path)`. For large refactors, upgrades, audits, or unfamiliar code, it MUST also use `search_project_code(project_path, query)` and `export_project_snapshot(project_path)` when a reusable overview is useful. Before editing any file, it MUST inspect the current target file with `read_project_file(project_path, relative_path)` or an equivalent file-read tool. Avoid repeated broad scans during the same session unless the project changed significantly.
+- **Reason (Required):** To ground implementation work in current standards and current project structure while preventing broad, repeated, token-heavy code scans.
+- **Do / Good Example:** Start a session by calling `recommend_context("implement rate limiting for Auth API")` and `get_project_tree(project_path)`, then use `search_project_code` and `read_project_file` to inspect only relevant files before editing.
+- **Don't / Bad Example:** Coding from assumptions, stale snapshots, or broad repeated scans without checking the current target file first.
+- **How to Test (Optional):** Ask the agent to list the standards/skills it loaded, the project tree scan it used, and the exact files it inspected before editing.

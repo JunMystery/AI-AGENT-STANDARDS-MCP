@@ -20,11 +20,11 @@ At the start of a coding session:
 
 1. Call `recommend_context(task)` to load relevant standards and skills.
 2. Call `get_project_tree(project_path, max_depth=3)` to understand the repository shape.
-3. Use `search_project_code(project_path, query)` to find relevant files.
-4. Use `read_project_file(project_path, relative_path)` before editing a target file.
+3. For large refactors, upgrades, audits, or unfamiliar code, also use `search_project_code(project_path, query)` and `export_project_snapshot(project_path)` when a reusable overview is useful.
+4. Before editing any file, inspect the current target file with `read_project_file(project_path, relative_path)` or an equivalent file-read tool.
 5. Run the smallest relevant verification command after changes.
 
-For large refactors, upgrades, audits, or unfamiliar codebases, call `export_project_snapshot(project_path)` to create a reusable `.agent-context/code-snapshot.json` overview.
+Avoid repeated broad scans during the same session unless the project changed significantly.
 
 ## Example: Standards Context
 
