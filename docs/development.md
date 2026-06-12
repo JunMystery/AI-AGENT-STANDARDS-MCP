@@ -2,7 +2,7 @@
 
 [Back to README](../README.md)
 
-This project is a small Python package that exposes the AI Agent Coding Standards corpus over MCP.
+This project is a small Python package that exposes Agent Guidance MCP over MCP, backed by the AI Agent Coding Standards corpus.
 
 ## Setup
 

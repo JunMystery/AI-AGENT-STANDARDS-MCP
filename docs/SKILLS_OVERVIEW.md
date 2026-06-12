@@ -1,6 +1,6 @@
 # Skills Overview
 
-This document provides a comprehensive directory of the **289** local skills packaged with the AI Agent Coding Standards MCP Server.
+This document provides a comprehensive directory of the **289** local skills packaged with the Agent Guidance MCP Server.
 
 | Skill / Tool Name | Description | When to Use |
 | :--- | :--- | :--- |

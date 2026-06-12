@@ -37,7 +37,7 @@ Linux/macOS:
 ```json
 {
   "mcpServers": {
-    "ai-agent-standards-mcp": {
+    "agent-guidance-mcp": {
       "command": "/absolute/path/to/repo/.venv/bin/python",
       "args": ["-m", "ai_agent_standards_mcp"],
       "env": { "PYTHONPATH": "/absolute/path/to/repo/src" }
@@ -51,7 +51,7 @@ Windows:
 ```json
 {
   "mcpServers": {
-    "ai-agent-standards-mcp": {
+    "agent-guidance-mcp": {
       "command": "C:\\absolute\\path\\to\\repo\\.venv\\Scripts\\python.exe",
       "args": ["-m", "ai_agent_standards_mcp"],
       "env": { "PYTHONPATH": "C:\\absolute\\path\\to\\repo\\src" }

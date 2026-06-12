@@ -1,4 +1,4 @@
-"""Command-line entry point for the AI Agent Standards MCP server."""
+"""Command-line entry point for the Agent Guidance MCP server."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from .server import create_server
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the AI Agent Standards MCP server.")
+    parser = argparse.ArgumentParser(description="Run the Agent Guidance MCP server.")
     parser.add_argument(
         "--root",
         help="Path to a standards corpus. Defaults to AI_AGENT_STANDARDS_ROOT or the bundled MCP repo corpus.",

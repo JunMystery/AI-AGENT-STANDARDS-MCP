@@ -1,4 +1,4 @@
-"""MCP registration for AI Agent Coding Standards."""
+"""MCP registration for Agent Guidance MCP."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def create_server(
         ) from MCP_IMPORT_ERROR
 
     catalog = build_catalog(root)
-    mcp = FastMCP("AI Agent Standards", json_response=True)
+    mcp = FastMCP("Agent Guidance MCP", json_response=True)
     register_handlers(mcp, catalog)
     return mcp
 

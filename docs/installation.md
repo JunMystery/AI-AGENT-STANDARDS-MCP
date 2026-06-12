@@ -32,6 +32,7 @@ For runtime-only usage, the project depends on `mcp>=1.0.0`. The `dev` extra add
 After installation, run the MCP server with:
 
 ```bash
+agent-guidance-mcp
 .venv/bin/python -m ai_agent_standards_mcp      # Linux / macOS
 .venv\Scripts\python.exe -m ai_agent_standards_mcp  # Windows
 ```

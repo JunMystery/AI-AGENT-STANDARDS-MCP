@@ -5,11 +5,23 @@ import json
 import subprocess
 from pathlib import Path
 
+SERVER_ID = "agent-guidance-mcp"
+LEGACY_SERVER_ID = "ai-agent-standards-mcp"
+MODULE_NAME = "ai_agent_standards_mcp"
+
+
+def owns_json_server_config(server_config):
+    if not isinstance(server_config, dict):
+        return False
+    args = server_config.get("args", [])
+    return isinstance(args, list) and MODULE_NAME in args
+
+
 def main():
     repo_root = Path(__file__).resolve().parents[1]
     venv_dir = repo_root / ".venv"
     
-    print("=== AI Agent Standards MCP Auto-Installer ===")
+    print("=== Agent Guidance MCP Auto-Installer ===")
     
     # 1. Setup virtual environment
     if not venv_dir.exists():
@@ -87,9 +99,15 @@ def main():
             
         # Configure the server using direct venv python execution (Option A)
         pythonpath = str(repo_root / "src")
-        config["mcpServers"]["ai-agent-standards-mcp"] = {
+        legacy_config = config["mcpServers"].get(LEGACY_SERVER_ID)
+        if legacy_config is not None and owns_json_server_config(legacy_config):
+            config["mcpServers"].pop(LEGACY_SERVER_ID)
+            print(f"    Migrated legacy '{LEGACY_SERVER_ID}' config to '{SERVER_ID}'.")
+        elif legacy_config is not None:
+            print(f"    Left custom legacy '{LEGACY_SERVER_ID}' config unchanged.")
+        config["mcpServers"][SERVER_ID] = {
             "command": str(python_exe),
-            "args": ["-m", "ai_agent_standards_mcp"],
+            "args": ["-m", MODULE_NAME],
             "env": {
                 "PYTHONPATH": pythonpath
             }
@@ -101,7 +119,7 @@ def main():
                 path.parent.mkdir(parents=True, exist_ok=True)
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(json.dumps(config, indent=2), encoding="utf-8")
-            print(f"    Success: Configured 'ai-agent-standards-mcp' server.")
+            print(f"    Success: Configured '{SERVER_ID}' server.")
         except Exception as e:
             print(f"    Error: Failed to write config file: {e}")
             
@@ -119,9 +137,9 @@ def configure_codex(python_exe, repo_root):
     pythonpath_str = str(repo_root / "src").replace("\\", "\\\\")
     
     new_block = [
-        "[mcp_servers.ai-agent-standards-mcp]",
+        f"[mcp_servers.{SERVER_ID}]",
         f'command = "{python_exe_str}"',
-        'args = ["-m", "ai_agent_standards_mcp"]',
+        f'args = ["-m", "{MODULE_NAME}"]',
         f'env = {{ PYTHONPATH = "{pythonpath_str}" }}',
         ""
     ]
@@ -133,25 +151,41 @@ def configure_codex(python_exe, repo_root):
         if config_path.exists():
             content = config_path.read_text(encoding="utf-8")
             
-        # Parse and replace the block if it exists
+        # Parse and replace owned legacy/current blocks while preserving unrelated blocks.
         lines = content.splitlines()
         new_lines = []
-        in_block = False
         block_found = False
-        
-        for line in lines:
+
+        def matching_server_id(header):
+            if header == f"[mcp_servers.{SERVER_ID}]":
+                return SERVER_ID
+            if header == f"[mcp_servers.{LEGACY_SERVER_ID}]":
+                return LEGACY_SERVER_ID
+            return None
+
+        index = 0
+        while index < len(lines):
+            line = lines[index]
             stripped = line.strip()
-            if stripped == "[mcp_servers.ai-agent-standards-mcp]":
-                in_block = True
-                block_found = True
-                new_lines.extend(new_block[:-1]) # add new block without the trailing newline
+            server_id = matching_server_id(stripped)
+            if server_id is None:
+                new_lines.append(line)
+                index += 1
                 continue
-            if in_block:
-                if stripped.startswith("["):
-                    in_block = False # exited the block
-                    new_lines.append(line)
+
+            block_lines = [line]
+            index += 1
+            while index < len(lines) and not lines[index].strip().startswith("["):
+                block_lines.append(lines[index])
+                index += 1
+
+            block_text = "\n".join(block_lines)
+            if server_id == SERVER_ID or MODULE_NAME in block_text:
+                if not block_found:
+                    block_found = True
+                    new_lines.extend(new_block[:-1]) # add new block without the trailing newline
                 continue
-            new_lines.append(line)
+            new_lines.extend(block_lines)
             
         if not block_found:
             if new_lines and new_lines[-1] != "":
@@ -159,7 +193,7 @@ def configure_codex(python_exe, repo_root):
             new_lines.extend(new_block)
             
         config_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-        print("    Success: Configured 'ai-agent-standards-mcp' server in Codex config.toml.")
+        print(f"    Success: Configured '{SERVER_ID}' server in Codex config.toml.")
     except Exception as e:
         print(f"    Error: Failed to configure Codex: {e}")
 

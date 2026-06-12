@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Cross-platform launcher for the AI Agent Standards MCP server.
+"""Cross-platform launcher for the Agent Guidance MCP server.
 
 This script works on both Windows and Linux/macOS. It automatically detects 
 the local virtual environment (.venv) if present, sets up the python path 

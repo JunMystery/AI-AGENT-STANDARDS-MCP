@@ -145,7 +145,7 @@ def test_create_server_initialization(monkeypatch):
 
     mcp = server.create_server(ROOT)
 
-    assert mcp.name == "AI Agent Standards"
+    assert mcp.name == "Agent Guidance MCP"
     assert mcp.kwargs["json_response"] is True
 
 

@@ -1,4 +1,4 @@
-"""MCP server package for AI Agent Coding Standards."""
+"""MCP server package for Agent Guidance MCP."""
 
 from .catalog import CatalogEntry, StandardsCatalog, build_catalog, find_standards_root
 

@@ -84,7 +84,7 @@ def main():
     
     with open(output_path, "w", encoding="utf-8") as f:
         f.write("# Skills Overview\n\n")
-        f.write(f"This document provides a comprehensive directory of the **{len(skills)}** local skills packaged with the AI Agent Coding Standards MCP Server.\n\n")
+        f.write(f"This document provides a comprehensive directory of the **{len(skills)}** local skills packaged with the Agent Guidance MCP Server.\n\n")
         
         f.write("| Skill / Tool Name | Description | When to Use |\n")
         f.write("| :--- | :--- | :--- |\n")
